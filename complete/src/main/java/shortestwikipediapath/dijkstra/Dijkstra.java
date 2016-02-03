@@ -1,6 +1,5 @@
 package shortestwikipediapath.dijkstra;
 
-import com.sun.org.apache.xpath.internal.SourceTree;
 import shortestwikipediapath.NoSuchArticleException;
 import shortestwikipediapath.dataorganization.WikipediaGetter;
 
