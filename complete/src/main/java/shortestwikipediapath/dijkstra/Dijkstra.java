@@ -19,12 +19,12 @@ public class Dijkstra {
 
     public String[] getShortestPath(String from, String to) {
         LinkedList<Path> paths = new LinkedList<>();
-        paths.add(new Path(null, from));
-        Path path = calculatePath(paths, to);
+        paths.add(new Path(null, from.toLowerCase()));
+        Path path = calculatePath(paths, to.toLowerCase());
 
         List<String> allEntries = new LinkedList<>();
         while (path != null) {
-            allEntries.add(0,path.getName());
+            allEntries.add(0, path.getName());
             path = path.getPrevious();
         }
         return allEntries.toArray(new String[0]);

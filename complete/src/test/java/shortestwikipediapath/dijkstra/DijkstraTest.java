@@ -32,6 +32,12 @@ public class DijkstraTest {
             return;
         }
         assertNotNull(null);
+    }@Test
+
+    public void canHandleCapitals() {
+        String[] results = dijkstra.getShortestPath("HELlo", "goodbyE");
+        // HELlo should be normalized to hello, goodbyE to goodbye
+        assertArrayEquals(new Object[]{"hello","life","death","goodbye"}, results);
     }
 
     /*
