@@ -11,10 +11,9 @@ import okhttp3.Response;
 import shortestwikipediapath.NoSuchArticleException;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by elisabet on 2016-02-03.
@@ -25,7 +24,7 @@ public class WikipediaClient {
 
         try {
             String response = callWikipedia(url);
-            parse(response);
+            return new ArrayList<>(parse(response));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -43,17 +42,15 @@ public class WikipediaClient {
         return response.body().string();
     }
 
-    private List<String> parse(String jsonString) throws IOException {
-        JsonFactory factory = new JsonFactory();
-        JsonParser parser  = factory.createParser(jsonString);
-
+    private Set<String> parse(String jsonString) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
 
         JsonNode node = objectMapper.readValue(jsonString, JsonNode.class);
         JsonNode pages = node.findValue("query").findValue("pages");
 
 
-        List<String> links = new ArrayList<>();
+        Set<String> links = new HashSet<>();
+        Pattern pattern = Pattern.compile("\\[\\[.*?(\\|[^\\]]*)?\\]\\]");
 
         Iterator<Map.Entry<String, JsonNode>> it = pages.fields();
 
@@ -63,10 +60,21 @@ public class WikipediaClient {
                 return links;
             }
             String content = entry.getValue().findValue("revisions").get(0).findValue("*").asText();
-            System.out.println(content);
+
+            Matcher m = pattern.matcher(content);
+            while (m.find()) {
+                StringBuffer sb = new StringBuffer(content.substring(m.start(), m.end()));
+                // remove initial [[
+                sb.delete(0,2);
+                // remove trailing ]]
+                sb.delete(sb.length() - 2, sb.length());
+                // remove any aliases
+                int index = sb.lastIndexOf("|");
+                if (index > 0) sb.delete(index, sb.length());
+
+                links.add(sb.toString());
+            }
         }
-
-
 
         return links;
     }
