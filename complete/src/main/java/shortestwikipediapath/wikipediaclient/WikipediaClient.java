@@ -47,7 +47,7 @@ public class WikipediaClient {
 
 
         Set<String> links = new HashSet<>();
-        Pattern pattern = Pattern.compile("\\[\\[.*?(\\|[^\\]]*)?\\]\\]");
+        Pattern pattern = Pattern.compile("\\[\\[.*?\\]\\]");
 
         Iterator<Map.Entry<String, JsonNode>> it = pages.fields();
 
@@ -66,8 +66,14 @@ public class WikipediaClient {
                 // remove trailing ]]
                 sb.delete(sb.length() - 2, sb.length());
                 // remove any aliases
-                int index = sb.lastIndexOf("|");
-                if (index > 0) sb.delete(index, sb.length());
+                int indexPipe = sb.indexOf("|");
+                if (indexPipe > 0) sb.delete(indexPipe, sb.length());
+                // remove any subsections
+                int indexHash = sb.indexOf("#");
+                if (indexHash > 0) sb.delete(indexHash, sb.length());
+                // remove any commas
+                int indexComma = sb.indexOf(",");
+                if (indexComma > 0) sb.delete(indexComma, sb.length());
 
                 links.add(sb.toString());
             }
